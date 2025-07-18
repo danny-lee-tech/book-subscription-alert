@@ -9,6 +9,7 @@ import (
 
 	"github.com/danny-lee-tech/book-subscription-alert/internal/fairyloot"
 	"github.com/danny-lee-tech/book-subscription-alert/internal/history"
+	"github.com/danny-lee-tech/book-subscription-alert/internal/illumicrate"
 	"github.com/danny-lee-tech/book-subscription-alert/internal/notifier"
 	"github.com/danny-lee-tech/book-subscription-alert/internal/owlcrate"
 	"github.com/danny-lee-tech/book-subscription-alert/internal/summarizer"
@@ -44,6 +45,10 @@ func main() {
 		log.Println("Error Checking OwlCrate:", err)
 	}
 	err = checkFairyLoot(client, notif)
+	if err != nil {
+		log.Println("Error Checking FairyLoot:", err)
+	}
+	err = checkIllumicrate(client, notif)
 	if err != nil {
 		log.Println("Error Checking FairyLoot:", err)
 	}
@@ -108,5 +113,36 @@ func checkFairyLoot(client *genai.Client, notif *notifier.Notifier) error {
 	}
 
 	fairyLootHistory.RecordItemIfNotExist(postUrl)
+	return nil
+}
+
+func checkIllumicrate(client *genai.Client, notif *notifier.Notifier) error {
+	post, postUrl, err := illumicrate.RetrieveLatestBlogPost()
+	if err != nil {
+		return err
+	}
+
+	illumicrateHistory := history.Init("illumicrate", 3)
+	isDuplicate, err := illumicrateHistory.CheckIfExists(postUrl)
+	if err != nil {
+		return err
+	}
+
+	if isDuplicate {
+		fmt.Println("Duplicate Illumicrate Post")
+		return nil
+	}
+
+	summary, err := summarizer.SummarizeText(client, "Illumicrate", post, postUrl)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(summary)
+	if notif != nil {
+		notif.NotifyWithLink(summary, postUrl)
+	}
+
+	illumicrateHistory.RecordItemIfNotExist(postUrl)
 	return nil
 }
