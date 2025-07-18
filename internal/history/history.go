@@ -23,6 +23,31 @@ func Init(key string, maxItems int) *History {
 	}
 }
 
+func (history *History) CheckIfExists(item string) (bool, error) {
+	file, err := os.OpenFile(history.file, os.O_RDWR|os.O_CREATE, 0644)
+	if err != nil {
+		return false, err
+	}
+	defer func() {
+		if err := file.Close(); err != nil {
+			panic(fmt.Sprintf("Error while closing resource %q: %+v", file.Name(), err))
+		}
+	}()
+
+	lastPostIdsBytes, err := io.ReadAll(file)
+	if err != nil {
+		return false, err
+	}
+	lastPostsString := string(lastPostIdsBytes)
+	lastPostItems := strings.Split(lastPostsString, "\n")
+
+	if slices.Contains(lastPostItems, item) {
+		return true, nil
+	}
+
+	return false, nil
+}
+
 func (history *History) RecordItemIfNotExist(item string) (bool, error) {
 	file, err := os.OpenFile(history.file, os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {

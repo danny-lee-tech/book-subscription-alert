@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/danny-lee-tech/book-subscription-alert/internal/fairyloot"
 	"github.com/danny-lee-tech/book-subscription-alert/internal/history"
 	"github.com/danny-lee-tech/book-subscription-alert/internal/notifier"
 	"github.com/danny-lee-tech/book-subscription-alert/internal/owlcrate"
@@ -37,7 +38,7 @@ func main() {
 		}
 	}
 
-	checkOwlCrate(client, notif)
+	checkFairyLoot(client, notif)
 }
 
 func checkOwlCrate(client *genai.Client, notif *notifier.Notifier) {
@@ -47,12 +48,12 @@ func checkOwlCrate(client *genai.Client, notif *notifier.Notifier) {
 	}
 
 	owlCrateHistory := history.Init("owlcrate", 3)
-	isRecorded, err := owlCrateHistory.RecordItemIfNotExist(postUrl)
+	isDuplicate, err := owlCrateHistory.CheckIfExists(postUrl)
 	if err != nil {
 		panic(err)
 	}
 
-	if !isRecorded {
+	if isDuplicate {
 		fmt.Println("Duplicate Owlcrate Post")
 		return
 	}
@@ -66,4 +67,36 @@ func checkOwlCrate(client *genai.Client, notif *notifier.Notifier) {
 	if notif != nil {
 		notif.NotifyWithLink(summary, postUrl)
 	}
+
+	owlCrateHistory.RecordItemIfNotExist(postUrl)
+}
+
+func checkFairyLoot(client *genai.Client, notif *notifier.Notifier) {
+	post, postUrl, err := fairyloot.RetrieveLatestBlogPost()
+	if err != nil {
+		panic(err)
+	}
+
+	fairyLootHistory := history.Init("fairyloot", 3)
+	isDuplicate, err := fairyLootHistory.CheckIfExists(postUrl)
+	if err != nil {
+		panic(err)
+	}
+
+	if isDuplicate {
+		fmt.Println("Duplicate FairyLoot Post")
+		return
+	}
+
+	summary, err := summarizer.SummarizeText(client, "FairyLoot", post, postUrl)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(summary)
+	if notif != nil {
+		notif.NotifyWithLink(summary, postUrl)
+	}
+
+	fairyLootHistory.RecordItemIfNotExist(postUrl)
 }

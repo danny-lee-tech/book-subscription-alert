@@ -11,8 +11,8 @@ func SummarizeText(client *genai.Client, company string, text string, url string
 	ctx, _ := context.WithTimeout(context.Background(), 20*time.Second)
 	result, err := client.Models.GenerateContent(
 		ctx,
-		"gemini-2.0-flash",
-		genai.Text("Output a very short summary with just the logistics (which includes the author name, dates, and any pricing) for the content added at the end of this. Also, generate me a google calendar link (text only) that uses the /calendar/render API to create an event for the early access sale with a description that includes the url, "+url+", and the same short summary from earlier. The title of the event should contain '"+company+"', the book name(s), the author, and the words 'Early Access Sale'. Here is the content: "+text),
+		"gemini-1.5-flash",
+		genai.Text("Output a very short summary with just the logistics (which includes the author name, dates, and any pricing) for the content added at the end of this. Also, generate me a google calendar link (text only) that uses the /calendar/render API to create an event for the early access sale with a description that includes the url, "+url+", and the same short summary from earlier. The title of the event should contain '"+company+"', the book name(s), the author, and the words 'Early Access Sale'. The summary should focus on the US, not the UK. Here is the content: "+text),
 		nil,
 	)
 
