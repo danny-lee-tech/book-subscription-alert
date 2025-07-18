@@ -11,6 +11,7 @@ import (
 
 const ScrapeUrl string = "https://community.fairyloot.com/category/book-announcements/"
 const RecentPostsLinkCssSelector string = ".blogArchive-posts h3.uppercase a"
+const PostArticleContentCssSelector string = ".singleBlog-content .wysiwyg"
 
 func RetrieveLatestBlogPost() (string, string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
@@ -49,8 +50,8 @@ func scrapeBlogPost(url string, c *context.Context) (string, error) {
 	var result string
 	err := chromedp.Run(*c,
 		chromedp.Navigate(url),
-		chromedp.WaitVisible(".singleBlog-content .wysiwyg", chromedp.ByQuery),
-		chromedp.Text(".singleBlog-content .wysiwyg", &result, chromedp.ByQuery),
+		chromedp.WaitVisible(PostArticleContentCssSelector, chromedp.ByQuery),
+		chromedp.Text(PostArticleContentCssSelector, &result, chromedp.ByQuery),
 	)
 	if err != nil {
 		return "", err

@@ -2,6 +2,7 @@ package owlcrate
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
@@ -9,6 +10,8 @@ import (
 )
 
 const ScrapeUrl string = "https://www.owlcrate.com/blogs/oc"
+const RecentPostsLinkCssSelector string = ".article h3 a"
+const PostArticleContentCssSelector string = "#bloggy--article"
 
 func RetrieveLatestBlogPost() (string, string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
@@ -26,9 +29,9 @@ func RetrieveLatestBlogPost() (string, string, error) {
 	var attributeFound bool
 	err := chromedp.Run(c,
 		chromedp.Navigate(ScrapeUrl),
-		chromedp.WaitVisible(".article h3 a", chromedp.ByQuery),
-		chromedp.Text(".article h3 a", &title, chromedp.ByQuery),
-		chromedp.AttributeValue(".article h3 a", "href", &href, &attributeFound, chromedp.ByQuery),
+		chromedp.WaitVisible(RecentPostsLinkCssSelector, chromedp.ByQuery),
+		chromedp.Text(RecentPostsLinkCssSelector, &title, chromedp.ByQuery),
+		chromedp.AttributeValue(RecentPostsLinkCssSelector, "href", &href, &attributeFound, chromedp.ByQuery),
 	)
 	if err != nil {
 		return "", "", err
@@ -48,11 +51,12 @@ func RetrieveLatestBlogPost() (string, string, error) {
 }
 
 func scrapeBlogPost(url string, c *context.Context) (string, error) {
+	fmt.Println("Scraping: " + url)
 	var result string
 	err := chromedp.Run(*c,
 		chromedp.Navigate(url),
-		chromedp.WaitVisible("#bloggy--article", chromedp.ByQuery),
-		chromedp.Text("#bloggy--article", &result, chromedp.ByQuery),
+		chromedp.WaitVisible(PostArticleContentCssSelector, chromedp.ByQuery),
+		chromedp.Text(PostArticleContentCssSelector, &result, chromedp.ByQuery),
 	)
 	if err != nil {
 		return "", err
