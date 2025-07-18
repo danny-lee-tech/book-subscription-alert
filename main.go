@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -38,29 +39,36 @@ func main() {
 		}
 	}
 
-	checkFairyLoot(client, notif)
+	err = checkOwlCrate(client, notif)
+	if err != nil {
+		log.Println("Error Checking OwlCrate:", err)
+	}
+	err = checkFairyLoot(client, notif)
+	if err != nil {
+		log.Println("Error Checking FairyLoot:", err)
+	}
 }
 
-func checkOwlCrate(client *genai.Client, notif *notifier.Notifier) {
+func checkOwlCrate(client *genai.Client, notif *notifier.Notifier) error {
 	post, postUrl, err := owlcrate.RetrieveLatestBlogPost()
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	owlCrateHistory := history.Init("owlcrate", 3)
 	isDuplicate, err := owlCrateHistory.CheckIfExists(postUrl)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	if isDuplicate {
 		fmt.Println("Duplicate Owlcrate Post")
-		return
+		return nil
 	}
 
 	summary, err := summarizer.SummarizeText(client, "OwlCrate", post, postUrl)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	fmt.Println(summary)
@@ -69,28 +77,29 @@ func checkOwlCrate(client *genai.Client, notif *notifier.Notifier) {
 	}
 
 	owlCrateHistory.RecordItemIfNotExist(postUrl)
+	return nil
 }
 
-func checkFairyLoot(client *genai.Client, notif *notifier.Notifier) {
+func checkFairyLoot(client *genai.Client, notif *notifier.Notifier) error {
 	post, postUrl, err := fairyloot.RetrieveLatestBlogPost()
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	fairyLootHistory := history.Init("fairyloot", 3)
 	isDuplicate, err := fairyLootHistory.CheckIfExists(postUrl)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	if isDuplicate {
 		fmt.Println("Duplicate FairyLoot Post")
-		return
+		return nil
 	}
 
 	summary, err := summarizer.SummarizeText(client, "FairyLoot", post, postUrl)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	fmt.Println(summary)
@@ -99,4 +108,5 @@ func checkFairyLoot(client *genai.Client, notif *notifier.Notifier) {
 	}
 
 	fairyLootHistory.RecordItemIfNotExist(postUrl)
+	return nil
 }
