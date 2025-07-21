@@ -64,6 +64,11 @@ func checkOwlCrate(client *genai.Client, notif *notifier.Notifier) error {
 		return err
 	}
 
+	if postUrl == "" {
+		fmt.Println("No recent special edition post found")
+		return nil
+	}
+
 	owlCrateHistory := history.Init("owlcrate", 3)
 	isDuplicate, err := owlCrateHistory.CheckIfExists(postUrl)
 	if err != nil {
@@ -95,6 +100,11 @@ func checkFairyLoot(client *genai.Client, notif *notifier.Notifier) error {
 		return err
 	}
 
+	if postUrl == "" {
+		fmt.Println("No recent special edition post found")
+		return nil
+	}
+
 	fairyLootHistory := history.Init("fairyloot", 3)
 	isDuplicate, err := fairyLootHistory.CheckIfExists(postUrl)
 	if err != nil {
@@ -124,6 +134,11 @@ func checkIllumicrate(client *genai.Client, notif *notifier.Notifier) error {
 	post, postUrl, err := illumicrate.RetrieveLatestBlogPost()
 	if err != nil {
 		return err
+	}
+
+	if postUrl == "" {
+		fmt.Println("No recent special edition post found")
+		return nil
 	}
 
 	illumicrateHistory := history.Init("illumicrate", 3)
