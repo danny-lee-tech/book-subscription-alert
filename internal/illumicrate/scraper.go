@@ -10,7 +10,7 @@ import (
 )
 
 const ScrapeUrl string = "https://us.illumicrate.com/blogs/news"
-const RecentPostsLinkCssSelector string = ".article-card > a"
+const RecentPostLinkCssSelector string = ".article-card > a"
 const PostArticleContentCssSelector string = ".article__content"
 
 func RetrieveLatestBlogPost() (string, string, error) {
@@ -24,14 +24,16 @@ func RetrieveLatestBlogPost() (string, string, error) {
 		}
 	}()
 
+	fmt.Println("Scraping: " + ScrapeUrl)
+
 	var title string
 	var href string
 	var attributeFound bool
 	err := chromedp.Run(c,
 		chromedp.Navigate(ScrapeUrl),
-		chromedp.WaitEnabled(RecentPostsLinkCssSelector, chromedp.ByQuery),
-		chromedp.AttributeValue(RecentPostsLinkCssSelector, "aria-label", &title, &attributeFound, chromedp.ByQuery),
-		chromedp.AttributeValue(RecentPostsLinkCssSelector, "href", &href, &attributeFound, chromedp.ByQuery),
+		chromedp.WaitEnabled(RecentPostLinkCssSelector, chromedp.ByQuery),
+		chromedp.AttributeValue(RecentPostLinkCssSelector, "aria-label", &title, &attributeFound, chromedp.ByQuery),
+		chromedp.AttributeValue(RecentPostLinkCssSelector, "href", &href, &attributeFound, chromedp.ByQuery),
 	)
 	if err != nil {
 		return "", "", err

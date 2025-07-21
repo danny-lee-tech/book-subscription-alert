@@ -10,7 +10,7 @@ import (
 )
 
 const ScrapeUrl string = "https://community.fairyloot.com/category/book-announcements/"
-const RecentPostsLinkCssSelector string = "article.global-featuredBlogPost a.btn-small"
+const RecentPostLinkCssSelector string = "article.global-featuredBlogPost a.btn-small"
 const PostArticleContentCssSelector string = ".singleBlog-content .wysiwyg"
 
 func RetrieveLatestBlogPost() (string, string, error) {
@@ -30,8 +30,8 @@ func RetrieveLatestBlogPost() (string, string, error) {
 	var attributeFound bool
 	err := chromedp.Run(c,
 		chromedp.Navigate(ScrapeUrl),
-		chromedp.WaitEnabled(RecentPostsLinkCssSelector, chromedp.ByQuery),
-		chromedp.AttributeValue(RecentPostsLinkCssSelector, "href", &href, &attributeFound, chromedp.ByQuery),
+		chromedp.WaitEnabled(RecentPostLinkCssSelector, chromedp.ByQuery),
+		chromedp.AttributeValue(RecentPostLinkCssSelector, "href", &href, &attributeFound, chromedp.ByQuery),
 	)
 	if err != nil {
 		return "", "", err
