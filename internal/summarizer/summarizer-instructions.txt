@@ -1,0 +1,15 @@
+Based on the content at the bottom, output a summary with the following template:
+
+Company: %s
+Book: <Book Name> by <Author>
+Price: <Price>
+Early Access Date: <Date/Time in EST of Early Access Sale>
+General Access Date: <Date/Time in EST of General Population Sale>
+URL: %s
+
+The above information should be populated with just the US-related information (not UK or Canada).
+
+Also, generate a google calendar link (text only) that uses the /calendar/render API to create an event.  The event date should be the date/time of the early access sale in EST and the event description should have the same summary from earlier.
+
+Content:
+%s

@@ -2,6 +2,7 @@ package summarizer
 
 import (
 	"context"
+	"embed"
 	"fmt"
 	"math"
 	"strings"
@@ -12,18 +13,25 @@ import (
 
 const RetryMaximum int = 6
 
+//go:embed summarizer-instructions.txt
+var promptTemplate embed.FS
+
 func SummarizeText(client *genai.Client, company string, text string, url string) (string, error) {
 	retryCount := 0
 	var result *genai.GenerateContentResponse
-	var err error
 
-	for true {
+	for {
 		fmt.Println("Summarizing Text for " + company)
+		// Read the content of the embedded file.
+		prompt, err := promptTemplate.ReadFile("summarizer-instructions.txt")
+		if err != nil {
+			return "", err
+		}
 		ctx, _ := context.WithTimeout(context.Background(), 20*time.Second)
 		result, err = client.Models.GenerateContent(
 			ctx,
 			"gemini-2.5-flash",
-			genai.Text("Output a very short summary with just the logistics (which includes the author name, dates, and any pricing) for the content added at the end of this. Also, generate me a google calendar link (text only) that uses the /calendar/render API to create an event for the early access sale with a description that includes the url, "+url+", and the same short summary from earlier. The title of the event should contain '"+company+"', the book name(s), the author, and the words 'Early Access Sale'. The summary should focus on the US, not the UK. Here is the content: "+text),
+			genai.Text(fmt.Sprintf(string(prompt), company, url, text)),
 			nil,
 		)
 
@@ -38,11 +46,11 @@ func SummarizeText(client *genai.Client, company string, text string, url string
 			}
 
 			sleepTime := math.Pow(2, float64(retryCount-1)) * 10
-			fmt.Println(fmt.Sprintf("Service unavailable: Retry #%d for %d seconds", int(retryCount), int(sleepTime)))
+			fmt.Printf("Service unavailable: Retry #%d for %d seconds\n", int(retryCount), int(sleepTime))
 			time.Sleep(time.Duration(sleepTime) * time.Second)
+		} else {
+			break
 		}
-
-		break
 	}
 	return result.Text(), nil
 }
