@@ -10,7 +10,8 @@ import (
 )
 
 const ScrapeUrl string = "https://www.owlcrate.com/blogs/oc"
-const RecentPostsLinkCssSelector string = ".article h3 a"
+const RecentPostLinkCssSelector string = ".featured__blog__container a.article__link"
+const RecentPostTitleCssSelector string = ".featured__blog__container .featured__blog__sub__heading h1"
 const PostArticleContentCssSelector string = "#bloggy--article"
 
 func RetrieveLatestBlogPost() (string, string, error) {
@@ -24,14 +25,16 @@ func RetrieveLatestBlogPost() (string, string, error) {
 		}
 	}()
 
+	fmt.Println("Scraping: " + ScrapeUrl)
+
 	var title string
 	var href string
 	var attributeFound bool
 	err := chromedp.Run(c,
 		chromedp.Navigate(ScrapeUrl),
-		chromedp.WaitVisible(RecentPostsLinkCssSelector, chromedp.ByQuery),
-		chromedp.Text(RecentPostsLinkCssSelector, &title, chromedp.ByQuery),
-		chromedp.AttributeValue(RecentPostsLinkCssSelector, "href", &href, &attributeFound, chromedp.ByQuery),
+		chromedp.WaitVisible(RecentPostLinkCssSelector, chromedp.ByQuery),
+		chromedp.Text(RecentPostTitleCssSelector, &title, chromedp.ByQuery),
+		chromedp.AttributeValue(RecentPostLinkCssSelector, "href", &href, &attributeFound, chromedp.ByQuery),
 	)
 	if err != nil {
 		return "", "", err
