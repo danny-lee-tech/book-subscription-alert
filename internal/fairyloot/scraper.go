@@ -10,7 +10,7 @@ import (
 )
 
 const ScrapeUrl string = "https://community.fairyloot.com/category/book-announcements/"
-const RecentPostsLinkCssSelector string = ".blogArchive-posts h3.uppercase a"
+const RecentPostsLinkCssSelector string = "article.global-featuredBlogPost a.btn-small"
 const PostArticleContentCssSelector string = ".singleBlog-content .wysiwyg"
 
 func RetrieveLatestBlogPost() (string, string, error) {
