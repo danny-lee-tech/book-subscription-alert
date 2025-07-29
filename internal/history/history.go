@@ -80,7 +80,7 @@ func (history *History) RecordItemIfNotExist(item string) (bool, error) {
 	}
 
 	if len(lastPostItems) > history.maxItems {
-		elementsToDelete := len(lastPostItems) - 10
+		elementsToDelete := len(lastPostItems) - history.maxItems
 		lastPostItems = lastPostItems[elementsToDelete:]
 	}
 	_, err = file.Write([]byte(strings.Join(lastPostItems, "\n")))
