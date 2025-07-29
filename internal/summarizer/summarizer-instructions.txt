@@ -7,7 +7,7 @@ Early Access Date: <Date/Time in EST of Early Access Sale>
 General Access Date: <Date/Time in EST of General Population Sale>
 URL: %s
 
-The above information should be populated with just the US-related information (not UK or Canada).
+The above information should be populated with just the US-related information (not UK or Canada).  Also, assume the dates are in the nearest future, unless the year is specified.
 
 Also, generate a google calendar link (text only) that uses the /calendar/render API to create an event.  The event date should be the date/time of the early access sale in EST and the event description should have the same summary from earlier.
 
