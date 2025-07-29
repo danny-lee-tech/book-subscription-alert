@@ -40,7 +40,7 @@ func RetrieveLatestBlogPost() (string, string, error) {
 		return "", "", err
 	}
 
-	if !strings.Contains(strings.ToLower(title), "limited editions") {
+	if !strings.Contains(strings.ToLower(title), "limited edition") {
 		return "", "", nil
 	}
 
