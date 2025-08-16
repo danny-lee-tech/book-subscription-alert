@@ -1,0 +1,33 @@
+name: Build and Release Go Executable
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger on tags like v1.0.0
+
+permissions:
+  contents: write # Needed for creating / updating releases and uploading assets
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version-file: 'go.mod' # Use go.mod to determine Go version
+
+      - name: Build executable
+        run: |
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o book-subscription-alert-linux-amd64 .
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            book-subscription-alert-linux-amd64
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
