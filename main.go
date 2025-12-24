@@ -87,7 +87,10 @@ func checkOwlCrate(client *genai.Client, notif *notifier.Notifier) error {
 
 	fmt.Println(summary)
 	if notif != nil {
-		notif.NotifyWithLink(summary, postUrl)
+		err = notif.NotifyWithLink(summary, postUrl)
+		if err != nil {
+			fmt.Printf("An error occurred: %v\n", err)
+		}
 	}
 
 	owlCrateHistory.RecordItemIfNotExist(postUrl)
